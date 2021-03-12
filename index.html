@@ -14,7 +14,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">FusorSim</a> - <span id="protoplanets"></span> webgl gpgpu debris
+			<a href="http://www.ddprofusion.com/" target="_blank" rel="noopener">FusorSim</a> - <span id="protoplanets"></span> webgl gpgpu debris
 		</div>
 
 		<!-- Fragment shader for protoplanet's position -->
@@ -307,6 +307,9 @@
 				initGUI();
 
 				initProtoplanets();
+				
+				initFusorModel();
+				initHelpers();
 
 				dynamicValuesChanger();
 
@@ -366,6 +369,33 @@
 				gpuCompute.renderTexture( dtVelocity, velocityVariable.renderTargets[ 0 ] );
 				gpuCompute.renderTexture( dtVelocity, velocityVariable.renderTargets[ 1 ] );
 
+			}
+			
+			function initHelpers() {
+				//The X axis is red. The Y axis is green. The Z axis is blue.
+				const axesHelper = new THREE.AxesHelper( 200 );
+				scene.add( axesHelper );
+			}
+
+			function initFusorModel() {
+
+				const fusorScale = 1;
+				const mag_distance = 200 * fusorScale; // distance between magnet rings
+				const mag_R = 200 * fusorScale; // major radius of magnet
+				const mag_r = 10 * fusorScale; // minor radius of magnet
+				const mag_segments = 32;  // how smooth to make the magnet
+				const geometry = new THREE.TorusGeometry( mag_R, mag_r, mag_segments, mag_segments*2 );
+				const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+				
+				const topMag = new THREE.Mesh( geometry, material );
+				topMag.position.y = mag_distance/2;
+				topMag.rotation.x = 3.14/2;
+				scene.add( topMag );	
+				
+				const bottomMag = new THREE.Mesh( geometry, material );
+				bottomMag.position.y = mag_distance/-2;
+				bottomMag.rotation.x = 3.14/2;
+				scene.add( bottomMag );	
 			}
 
 			function initProtoplanets() {
