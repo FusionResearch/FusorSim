@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>FusorSim</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="./src/css/main.css">
-		<style>
-			#warning {
-				color: #ff0000;
-			}
-		</style>
-	</head>
-	<body>
 
-		<div id="info">
-			<a href="http://www.ddprofusion.com/" target="_blank" rel="noopener">FusorSim</a> - <span id="protoplanets"></span> webgl gpgpu debris
-		</div>
+<head>
+	<title>FusorSim</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="./src/css/main.css">
+	<style>
+		#warning {
+			color: #ff0000;
+		}
+	</style>
+</head>
 
-		<!-- Fragment shader for protoplanet's position -->
-		<script id="computeShaderPosition" type="x-shader/x-fragment">
+<body>
+
+	<div id="info">
+		<a href="http://www.ddprofusion.com/" target="_blank" rel="noopener">FusorSim</a> - <span
+			id="protoplanets"></span> webgl gpgpu 
+	</div>
+
+	<!-- Fragment shader for protoplanet's position -->
+	<script id="computeShaderPosition" type="x-shader/x-fragment">
 
 			#define delta ( 1.0 / 60.0 )
 
@@ -46,8 +49,8 @@
 
 		</script>
 
-		<!-- Fragment shader for protoplanet's velocity -->
-		<script id="computeShaderVelocity" type="x-shader/x-fragment">
+	<!-- Fragment shader for protoplanet's velocity -->
+	<script id="computeShaderVelocity" type="x-shader/x-fragment">
 
 			// For PI declaration:
 			#include <common>
@@ -162,8 +165,8 @@
 
 		</script>
 
-		<!-- Particles vertex shader -->
-		<script type="x-shader/x-vertex" id="particleVertexShader">
+	<!-- Particles vertex shader -->
+	<script type="x-shader/x-vertex" id="particleVertexShader">
 
 			// For PI declaration:
 			#include <common>
@@ -214,8 +217,8 @@
 
 		</script>
 
-		<!-- Particles fragment shader -->
-		<script type="x-shader/x-fragment" id="particleFragmentShader">
+	<!-- Particles fragment shader -->
+	<script type="x-shader/x-fragment" id="particleFragmentShader">
 
 			varying vec4 vColor;
 
@@ -231,367 +234,377 @@
 
 		</script>
 
-		<script type="module">
+	<script type="module">
 
-			import * as THREE from './vendor/build/three.module.js';
+		import * as THREE from './vendor/build/three.module.js';
 
-			import Stats from './vendor/three/jsm/libs/stats.module.js';
-			import { GUI } from './vendor/three/jsm/libs/dat.gui.module.js';
+		import Stats from './vendor/three/jsm/libs/stats.module.js';
+		import { GUI } from './vendor/three/jsm/libs/dat.gui.module.js';
 
-			import { OrbitControls } from './vendor/three/jsm/controls/OrbitControls.js';
-			import { GPUComputationRenderer } from './vendor/three/jsm/misc/GPUComputationRenderer.js';
+		import { OrbitControls } from './vendor/three/jsm/controls/OrbitControls.js';
+		import { GPUComputationRenderer } from './vendor/three/jsm/misc/GPUComputationRenderer.js';
 
-			const isIE = /Trident/i.test( navigator.userAgent );
-			const isEdge = /Edge/i.test( navigator.userAgent );
+		const isIE = /Trident/i.test(navigator.userAgent);
+		const isEdge = /Edge/i.test(navigator.userAgent);
 
-			// Texture width for simulation (each texel is a debris particle)
-			const WIDTH = ( isIE || isEdge ) ? 4 : 64;
+		// Texture width for simulation (each texel is a debris particle)
+		const WIDTH = (isIE || isEdge) ? 4 : 64;
 
-			let container, stats;
-			let camera, scene, renderer, geometry;
-			
-			const PARTICLES = WIDTH * WIDTH;
+		let container, stats;
+		let camera, scene, renderer, geometry;
 
-			let gpuCompute;
-			let velocityVariable;
-			let positionVariable;
-			let velocityUniforms;
-			let particleUniforms;
-			let effectController;
+		const PARTICLES = WIDTH * WIDTH;
 
-			init();
-			animate();
+		let gpuCompute;
+		let velocityVariable;
+		let positionVariable;
+		let velocityUniforms;
+		let particleUniforms;
+		let effectController;
 
-			function init() {
+		init();
+		animate();
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+		function init() {
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 5, 15000 );
-				camera.position.y = 120;
-				camera.position.z = 400;
+			container = document.createElement('div');
+			document.body.appendChild(container);
 
-				scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 5, 15000);
+			camera.position.y = 120;
+			camera.position.z = 400;
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+			scene = new THREE.Scene();
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 100;
-				controls.maxDistance = 1000;
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			container.appendChild(renderer.domElement);
 
-				effectController = {
-					// Can be changed dynamically
-					gravityConstant: 100.0,
-					density: 0.45,
+			const controls = new OrbitControls(camera, renderer.domElement);
+			controls.minDistance = 100;
+			controls.maxDistance = 1000;
 
-					// Must restart simulation
-					radius: 300,
-					height: 8,
-					exponent: 0.4,
-					maxMass: 15.0,
-					velocity: 70,
-					velocityExponent: 0.2,
-					randVelocity: 0.001
-				};
+			effectController = {
+				// Can be changed dynamically
+				gravityConstant: 100.0,
+				density: 0.45,
 
-				initComputeRenderer();
+				// Must restart simulation
+				radius: 300,
+				height: 8,
+				exponent: 0.4,
+				maxMass: 15.0,
+				velocity: 70,
+				velocityExponent: 0.2,
+				randVelocity: 0.001
+			};
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+			initComputeRenderer();
 
-				window.addEventListener( 'resize', onWindowResize );
+			stats = new Stats();
+			container.appendChild(stats.dom);
 
-				initGUI();
+			window.addEventListener('resize', onWindowResize);
 
-				initProtoplanets();
-				
-				initFusorModel();
-				initHelpers();
+			initGUI();
 
-				dynamicValuesChanger();
+			initProtoplanets();
 
-			}
+			initFusorModel();
+			initHelpers();
 
-			function initComputeRenderer() {
+			dynamicValuesChanger();
 
-				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+		}
 
-				if ( isSafari() ) {
+		function initComputeRenderer() {
 
-					gpuCompute.setDataType( THREE.HalfFloatType );
+			gpuCompute = new GPUComputationRenderer(WIDTH, WIDTH, renderer);
 
-				}
+			if (isSafari()) {
 
-				const dtPosition = gpuCompute.createTexture();
-				const dtVelocity = gpuCompute.createTexture();
-
-				fillTextures( dtPosition, dtVelocity );
-
-				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
-				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
-
-				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
-				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
-
-				velocityUniforms = velocityVariable.material.uniforms;
-
-				velocityUniforms[ "gravityConstant" ] = { value: 0.0 };
-				velocityUniforms[ "density" ] = { value: 0.0 };
-
-				const error = gpuCompute.init();
-
-				if ( error !== null ) {
-
-					console.error( error );
-
-				}
+				gpuCompute.setDataType(THREE.HalfFloatType);
 
 			}
 
-			function isSafari() {
+			const dtPosition = gpuCompute.createTexture();
+			const dtVelocity = gpuCompute.createTexture();
 
-				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
+			fillTextures(dtPosition, dtVelocity);
 
-			}
+			velocityVariable = gpuCompute.addVariable("textureVelocity", document.getElementById('computeShaderVelocity').textContent, dtVelocity);
+			positionVariable = gpuCompute.addVariable("texturePosition", document.getElementById('computeShaderPosition').textContent, dtPosition);
 
-			function restartSimulation() {
+			gpuCompute.setVariableDependencies(velocityVariable, [positionVariable, velocityVariable]);
+			gpuCompute.setVariableDependencies(positionVariable, [positionVariable, velocityVariable]);
 
-				const dtPosition = gpuCompute.createTexture();
-				const dtVelocity = gpuCompute.createTexture();
+			velocityUniforms = velocityVariable.material.uniforms;
 
-				fillTextures( dtPosition, dtVelocity );
+			velocityUniforms["gravityConstant"] = { value: 0.0 };
+			velocityUniforms["density"] = { value: 0.0 };
 
-				gpuCompute.renderTexture( dtPosition, positionVariable.renderTargets[ 0 ] );
-				gpuCompute.renderTexture( dtPosition, positionVariable.renderTargets[ 1 ] );
-				gpuCompute.renderTexture( dtVelocity, velocityVariable.renderTargets[ 0 ] );
-				gpuCompute.renderTexture( dtVelocity, velocityVariable.renderTargets[ 1 ] );
+			const error = gpuCompute.init();
 
-			}
-			
-			function initHelpers() {
-				//The X axis is red. The Y axis is green. The Z axis is blue.
-				const axesHelper = new THREE.AxesHelper( 200 );
-				scene.add( axesHelper );
-			}
+			if (error !== null) {
 
-			function initFusorModel() {
-
-				const fusorScale = 1;
-				const mag_distance = 200 * fusorScale; // distance between magnet rings
-				const mag_R = 200 * fusorScale; // major radius of magnet
-				const mag_r = 10 * fusorScale; // minor radius of magnet
-				const mag_segments = 32;  // how smooth to make the magnet
-				const geometry = new THREE.TorusGeometry( mag_R, mag_r, mag_segments, mag_segments*2 );
-				const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-				
-				const topMag = new THREE.Mesh( geometry, material );
-				topMag.position.y = mag_distance/2;
-				topMag.rotation.x = 3.14/2;
-				scene.add( topMag );	
-				
-				const bottomMag = new THREE.Mesh( geometry, material );
-				bottomMag.position.y = mag_distance/-2;
-				bottomMag.rotation.x = 3.14/2;
-				scene.add( bottomMag );	
-			}
-
-			function initProtoplanets() {
-
-				geometry = new THREE.BufferGeometry();
-
-				const positions = new Float32Array( PARTICLES * 3 );
-				let p = 0;
-
-				for ( let i = 0; i < PARTICLES; i ++ ) {
-
-					positions[ p ++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
-					positions[ p ++ ] = 0; //( Math.random() * 2 - 1 ) * effectController.radius;
-					positions[ p ++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
-
-				}
-
-				const uvs = new Float32Array( PARTICLES * 2 );
-				p = 0;
-
-				for ( let j = 0; j < WIDTH; j ++ ) {
-
-					for ( let i = 0; i < WIDTH; i ++ ) {
-
-						uvs[ p ++ ] = i / ( WIDTH - 1 );
-						uvs[ p ++ ] = j / ( WIDTH - 1 );
-
-					}
-
-				}
-
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
-
-				particleUniforms = {
-					"texturePosition": { value: null },
-					"textureVelocity": { value: null },
-					"cameraConstant": { value: getCameraConstant( camera ) },
-					"density": { value: 0.0 }
-				};
-
-				// THREE.ShaderMaterial
-				const material = new THREE.ShaderMaterial( {
-					uniforms: particleUniforms,
-					vertexShader: document.getElementById( 'particleVertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
-				} );
-
-				material.extensions.drawBuffers = true;
-
-				const particles = new THREE.Points( geometry, material );
-				particles.matrixAutoUpdate = false;
-				particles.updateMatrix();
-
-				scene.add( particles );
+				console.error(error);
 
 			}
 
-			function fillTextures( texturePosition, textureVelocity ) {
+		}
 
-				const posArray = texturePosition.image.data;
-				const velArray = textureVelocity.image.data;
+		function isSafari() {
 
-				const radius = effectController.radius;
-				const height = effectController.height;
-				const exponent = effectController.exponent;
-				const maxMass = effectController.maxMass * 1024 / PARTICLES;
-				const maxVel = effectController.velocity;
-				const velExponent = effectController.velocityExponent;
-				const randVel = effectController.randVelocity;
+			return !!navigator.userAgent.match(/Safari/i) && !navigator.userAgent.match(/Chrome/i);
 
-				for ( let k = 0, kl = posArray.length; k < kl; k += 4 ) {
+		}
 
-					// Position
-					let x, z, rr;
+		function restartSimulation() {
 
-					do {
+			const dtPosition = gpuCompute.createTexture();
+			const dtVelocity = gpuCompute.createTexture();
 
-						x = ( Math.random() * 2 - 1 );
-						z = ( Math.random() * 2 - 1 );
-						rr = x * x + z * z;
+			fillTextures(dtPosition, dtVelocity);
 
-					} while ( rr > 1 );
+			gpuCompute.renderTexture(dtPosition, positionVariable.renderTargets[0]);
+			gpuCompute.renderTexture(dtPosition, positionVariable.renderTargets[1]);
+			gpuCompute.renderTexture(dtVelocity, velocityVariable.renderTargets[0]);
+			gpuCompute.renderTexture(dtVelocity, velocityVariable.renderTargets[1]);
 
-					rr = Math.sqrt( rr );
+		}
 
-					const rExp = radius * Math.pow( rr, exponent );
+		function initHelpers() {
+			//The X axis is red. The Y axis is green. The Z axis is blue.
+			const axesHelper = new THREE.AxesHelper(200);
+			scene.add(axesHelper);
+		}
 
-					// Velocity
-					const vel = maxVel * Math.pow( rr, velExponent );
+		function initFusorModel() {
 
-					const vx = vel * z + ( Math.random() * 2 - 1 ) * randVel;
-					const vy = ( Math.random() * 2 - 1 ) * randVel * 0.05;
-					const vz = - vel * x + ( Math.random() * 2 - 1 ) * randVel;
+			const fusorScale = 1;
+			const mag_distance = 250 * fusorScale; // distance between magnet rings
+			const mag_R = 200 * fusorScale; // major radius of magnet
+			const mag_r = 10 * fusorScale; // minor radius of magnet
+			const mag_segments = 32;  // how smooth to make the magnet
+			const geometry = new THREE.TorusGeometry(mag_R, mag_r, mag_segments, mag_segments * 2);
+			const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 
-					x *= rExp;
-					z *= rExp;
-					const y = ( Math.random() * 2 - 1 ) * height;
+			const topMag = new THREE.Mesh(geometry, material);
+			topMag.position.y = mag_distance / 2;
+			topMag.rotation.x = 3.14 / 2;
+			scene.add(topMag);
 
-					const mass = Math.random() * maxMass + 1;
+			const bottomMag = new THREE.Mesh(geometry, material);
+			bottomMag.position.y = mag_distance / -2;
+			bottomMag.rotation.x = 3.14 / 2;
+			scene.add(bottomMag);
 
-					// Fill in texture values
-					posArray[ k + 0 ] = x;
-					posArray[ k + 1 ] = y;
-					posArray[ k + 2 ] = z;
-					posArray[ k + 3 ] = 1;
+			const vacChamber = new THREE.CylinderGeometry(mag_R * 1.3, mag_R * 1.3, mag_distance * 1.2, 16);
+			const wireframe = new THREE.WireframeGeometry(vacChamber);
+			const line = new THREE.LineSegments(wireframe);
+			line.material.depthTest = false;
+			line.material.opacity = 0.25;
+			line.material.transparent = true;
 
-					velArray[ k + 0 ] = vx;
-					velArray[ k + 1 ] = vy;
-					velArray[ k + 2 ] = vz;
-					velArray[ k + 3 ] = mass;
+			scene.add(line);
+		}
+
+		function initProtoplanets() {
+
+			geometry = new THREE.BufferGeometry();
+
+			const positions = new Float32Array(PARTICLES * 3);
+			let p = 0;
+
+			for (let i = 0; i < PARTICLES; i++) {
+
+				positions[p++] = (Math.random() * 2 - 1) * effectController.radius;
+				positions[p++] = 0; //( Math.random() * 2 - 1 ) * effectController.radius;
+				positions[p++] = (Math.random() * 2 - 1) * effectController.radius;
+
+			}
+
+			const uvs = new Float32Array(PARTICLES * 2);
+			p = 0;
+
+			for (let j = 0; j < WIDTH; j++) {
+
+				for (let i = 0; i < WIDTH; i++) {
+
+					uvs[p++] = i / (WIDTH - 1);
+					uvs[p++] = j / (WIDTH - 1);
 
 				}
 
 			}
 
-			function onWindowResize() {
+			geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+			geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+			particleUniforms = {
+				"texturePosition": { value: null },
+				"textureVelocity": { value: null },
+				"cameraConstant": { value: getCameraConstant(camera) },
+				"density": { value: 0.0 }
+			};
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+			// THREE.ShaderMaterial
+			const material = new THREE.ShaderMaterial({
+				uniforms: particleUniforms,
+				vertexShader: document.getElementById('particleVertexShader').textContent,
+				fragmentShader: document.getElementById('particleFragmentShader').textContent
+			});
 
-				particleUniforms[ "cameraConstant" ].value = getCameraConstant( camera );
+			material.extensions.drawBuffers = true;
+
+			const particles = new THREE.Points(geometry, material);
+			particles.matrixAutoUpdate = false;
+			particles.updateMatrix();
+
+			scene.add(particles);
+
+		}
+
+		function fillTextures(texturePosition, textureVelocity) {
+
+			const posArray = texturePosition.image.data;
+			const velArray = textureVelocity.image.data;
+
+			const radius = effectController.radius;
+			const height = effectController.height;
+			const exponent = effectController.exponent;
+			const maxMass = effectController.maxMass * 1024 / PARTICLES;
+			const maxVel = effectController.velocity;
+			const velExponent = effectController.velocityExponent;
+			const randVel = effectController.randVelocity;
+
+			for (let k = 0, kl = posArray.length; k < kl; k += 4) {
+
+				// Position
+				let x, z, rr;
+
+				do {
+
+					x = (Math.random() * 2 - 1);
+					z = (Math.random() * 2 - 1);
+					rr = x * x + z * z;
+
+				} while (rr > 1);
+
+				rr = Math.sqrt(rr);
+
+				const rExp = radius * Math.pow(rr, exponent);
+
+				// Velocity
+				const vel = maxVel * Math.pow(rr, velExponent);
+
+				const vx = vel * z + (Math.random() * 2 - 1) * randVel;
+				const vy = (Math.random() * 2 - 1) * randVel * 0.05;
+				const vz = - vel * x + (Math.random() * 2 - 1) * randVel;
+
+				x *= rExp;
+				z *= rExp;
+				const y = (Math.random() * 2 - 1) * height;
+
+				const mass = Math.random() * maxMass + 1;
+
+				// Fill in texture values
+				posArray[k + 0] = x;
+				posArray[k + 1] = y;
+				posArray[k + 2] = z;
+				posArray[k + 3] = 1;
+
+				velArray[k + 0] = vx;
+				velArray[k + 1] = vy;
+				velArray[k + 2] = vz;
+				velArray[k + 3] = mass;
 
 			}
 
-			function dynamicValuesChanger() {
+		}
 
-				velocityUniforms[ "gravityConstant" ].value = effectController.gravityConstant;
-				velocityUniforms[ "density" ].value = effectController.density;
-				particleUniforms[ "density" ].value = effectController.density;
+		function onWindowResize() {
 
-			}
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
 
-			function initGUI() {
+			renderer.setSize(window.innerWidth, window.innerHeight);
 
-				const gui = new GUI( { width: 300 } );
+			particleUniforms["cameraConstant"].value = getCameraConstant(camera);
 
-				const folder1 = gui.addFolder( 'Dynamic parameters' );
+		}
 
-				folder1.add( effectController, "gravityConstant", 0.0, 1000.0, 0.05 ).onChange( dynamicValuesChanger );
-				folder1.add( effectController, "density", 0.0, 10.0, 0.001 ).onChange( dynamicValuesChanger );
+		function dynamicValuesChanger() {
 
-				const folder2 = gui.addFolder( 'Static parameters' );
+			velocityUniforms["gravityConstant"].value = effectController.gravityConstant;
+			velocityUniforms["density"].value = effectController.density;
+			particleUniforms["density"].value = effectController.density;
 
-				folder2.add( effectController, "radius", 10.0, 1000.0, 1.0 );
-				folder2.add( effectController, "height", 0.0, 50.0, 0.01 );
-				folder2.add( effectController, "exponent", 0.0, 2.0, 0.001 );
-				folder2.add( effectController, "maxMass", 1.0, 50.0, 0.1 );
-				folder2.add( effectController, "velocity", 0.0, 150.0, 0.1 );
-				folder2.add( effectController, "velocityExponent", 0.0, 1.0, 0.01 );
-				folder2.add( effectController, "randVelocity", 0.0, 50.0, 0.1 );
+		}
 
-				const buttonRestart = {
-					restartSimulation: function () {
+		function initGUI() {
 
-						restartSimulation();
+			const gui = new GUI({ width: 300 });
 
-					}
-				};
+			const folder1 = gui.addFolder('Dynamic parameters');
 
-				folder2.add( buttonRestart, 'restartSimulation' );
+			folder1.add(effectController, "gravityConstant", 0.0, 1000.0, 0.05).onChange(dynamicValuesChanger);
+			folder1.add(effectController, "density", 0.0, 10.0, 0.001).onChange(dynamicValuesChanger);
 
-				folder1.open();
-				folder2.open();
+			const folder2 = gui.addFolder('Static parameters');
 
-			}
+			folder2.add(effectController, "radius", 10.0, 1000.0, 1.0);
+			folder2.add(effectController, "height", 0.0, 50.0, 0.01);
+			folder2.add(effectController, "exponent", 0.0, 2.0, 0.001);
+			folder2.add(effectController, "maxMass", 1.0, 50.0, 0.1);
+			folder2.add(effectController, "velocity", 0.0, 150.0, 0.1);
+			folder2.add(effectController, "velocityExponent", 0.0, 1.0, 0.01);
+			folder2.add(effectController, "randVelocity", 0.0, 50.0, 0.1);
 
-			function getCameraConstant( camera ) {
+			const buttonRestart = {
+				restartSimulation: function () {
 
-				return window.innerHeight / ( Math.tan( THREE.MathUtils.DEG2RAD * 0.5 * camera.fov ) / camera.zoom );
+					restartSimulation();
 
-			}
+				}
+			};
+
+			folder2.add(buttonRestart, 'restartSimulation');
+
+			folder1.open();
+			folder2.open();
+
+		}
+
+		function getCameraConstant(camera) {
+
+			return window.innerHeight / (Math.tan(THREE.MathUtils.DEG2RAD * 0.5 * camera.fov) / camera.zoom);
+
+		}
 
 
-			function animate() {
+		function animate() {
 
-				requestAnimationFrame( animate );
+			requestAnimationFrame(animate);
 
-				render();
-				stats.update();
+			render();
+			stats.update();
 
-			}
+		}
 
-			function render() {
+		function render() {
 
-				gpuCompute.compute();
+			gpuCompute.compute();
 
-				particleUniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				particleUniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+			particleUniforms["texturePosition"].value = gpuCompute.getCurrentRenderTarget(positionVariable).texture;
+			particleUniforms["textureVelocity"].value = gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
 
-				renderer.render( scene, camera );
+			renderer.render(scene, camera);
 
-			}
+		}
 
-		</script>
-	</body>
+	</script>
+</body>
+
 </html>
