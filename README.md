@@ -1,6 +1,8 @@
 # FusorSim
 HTML5 simulator/game that tracks ions in IEC fusion device.
 
+Try it out at https://fusionresearch.github.io/FusorSim/
+
 
 Dev goals order of importance:
 * Written in Javascript for low barrier to entry for development(may change if perf requires)
