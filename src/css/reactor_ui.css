@@ -1,0 +1,220 @@
+body {
+    overflow: hidden;
+    /* hide scrollbars */
+    color: bisque;
+    background-color: #000;
+    font-family: sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+.grid-container {
+    display: grid;
+    grid: 250px / auto auto auto auto;
+    grid-gap: 2px;
+    padding: 2px;
+    background-color: #555;
+}
+  
+.grid-container > div {
+    background-color: rgba(1, 1, 1, 0.8);
+    text-align: center;
+    padding: 0px 0;
+}
+
+#instrumentBar {
+    color: azure;
+}
+
+#guages {
+    text-align: center;
+    max-width: 270px;
+}
+
+#trend {
+    background-color: #fff;
+    overflow: hidden;
+    max-width: 1000px;
+}
+
+#winCond {
+    font-size: smaller;
+}
+
+
+#trendCanvas {
+    height: auto;
+    background-color: #fff;
+}
+
+#heatMapCanvas {
+    height: 200px;
+    /* background-color: black; */
+}
+
+.guage {
+    float: left;
+}
+
+#gameCanvas {
+    padding: 0px;
+    border: 0px;
+    margin: 0px;
+    z-index: 0;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    /* background-color: black; */
+}
+
+/* The slider itself */
+.slider {
+    -webkit-appearance: none;
+    /* Override default CSS styles */
+    width: 250px;
+    /* Full-width */
+    height: 25px;
+    /* Specified height */
+    background: #d3d3d3;
+    /* Grey background */
+    outline: none;
+    /* Remove outline */
+    opacity: 0.6;
+    /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s;
+    /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.slidecontainer {
+    width: 100%;
+    height: 25px;
+    /* Width of the outside container */
+}
+
+/* Mouse-over effects */
+.slider:hover {
+    opacity: 0.8;
+    /* Fully shown on mouse-over */
+}
+
+.sliderDisplay {
+    padding-left: 10px;
+    padding-top: 5px;
+    position: absolute;
+    z-index: -1;
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    /* Override default look */
+    appearance: none;
+    width: 25px;
+    /* Set a specific slider handle width */
+    height: 25px;
+    /* Slider handle height */
+    background: #4CAF50;
+    /* Green background */
+    cursor: pointer;
+    /* Cursor on hover */
+}
+
+.modal {
+    color: black;
+    position: fixed;
+    margin: 10px;
+    padding: 10px;
+    bottom: 20%;
+    left: 20%;
+    opacity: 0.95;
+    width: auto;
+    max-width: 60%;
+    height: auto;
+    background: #DDD;
+    z-index: 3;
+    border: 3px solid #73AD21;
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+    /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 90%;
+    left: 50%;
+    margin-left: -60px;
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.card {
+    /* Add shadows to create the "card" effect */
+    float: left;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    width: 15%;
+    margin: 10px;
+    background-color: #EEE;
+    font-size: smaller;
+}
+
+.card h4 {
+    margin: 5px;
+}
+
+.card img {
+    border-radius: 5px;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Add some padding inside the card container */
+.card .container {
+    padding: 2px 8px;
+}
+
+.footer {
+    float: none;
+}
+
+.odometer {
+    font-size: 20px;
+}
