@@ -16,8 +16,9 @@
 <body>
 
 	<div id="info">
-		<a href="http://www.ddprofusion.com/" target="_blank" rel="noopener">FusorSim</a> - <span
-			id="protoplanets"></span> webgl gpgpu 
+		<!-- <a href="http://www.ddprofusion.com/" target="_blank" rel="noopener">DD Pro Fusion</a> - -->
+		<a href="https://github.com/FusionResearch/FusorSim" target="_blank" rel="noopener">FusorSim</a> - 
+		<span id="protoplanets"></span> webgl gpgpu 
 	</div>
 
 	<!-- Fragment shader for protoplanet's position -->
@@ -166,6 +167,7 @@
 		</script>
 
 	<!-- Particles vertex shader -->
+	<!-- TOOD: figure out how  to include from external file src="./src/shaders/particleVertexShader.glsl" -->
 	<script type="x-shader/x-vertex" id="particleVertexShader">
 
 			// For PI declaration:
@@ -248,7 +250,7 @@
 		const isEdge = /Edge/i.test(navigator.userAgent);
 
 		// Texture width for simulation (each texel is a debris particle)
-		const WIDTH = (isIE || isEdge) ? 4 : 64;
+		const WIDTH = (isIE || isEdge) ? 4 : 128;
 
 		let container, stats;
 		let camera, scene, renderer, geometry;

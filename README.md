@@ -29,3 +29,17 @@ npx serve
 ```
 
 You should now be able to test the sim at  http://localhost:5000
+
+
+
+
+## Modeling constraints
+for a 1 cubic meter chamber,  with D pressure of y 1.2E-5 Torr that is 1.8E20 particles, too many to simualte
+
+1.2E-5 * 1/760 * 1000*22.4 = 0.0003 mol Detrium = 1.8E20 particles/cubic meter
+
+At 1E-3 torr 2.7 x 10E19 / 760 x 1E3 = 3.6 x E13 molecules/cm3 
+
+1 × 10−7 Torr, corresponds to a neutral particle density of ≈ 3.2 × 10^15 m−3  
+
+
