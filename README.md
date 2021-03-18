@@ -26,6 +26,8 @@ git clone https://github.com/FusionResearch/FusorSim.git
 
 #start a localhost server, assuming you have node/npm
 npx serve
+or
+npx browser-sync start -s -f . --no-notify --host 127.0.0.1 --port 5000
 ```
 
 You should now be able to test the sim at  http://localhost:5000

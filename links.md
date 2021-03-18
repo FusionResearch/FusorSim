@@ -4,7 +4,23 @@ https://bitbucket.org/berkeleylab/warp/
 http://warp.lbl.gov/home/how-to-s/installation
 https://blast.lbl.gov/blast-codes-warp/
 
+Best shader/webgl tutorials:
+https://thebookofshaders.com/03/
+http://www.vizitsolutions.com/portfolio/webgl/gpgpu/
 
+
+https://graphtoy.com/index.html
+
+follow https://bitbucket.org/berkeleylab/warp/src/f1d0f36ed1e7d9863c33a48c949a637929dc0e1c/doc/INSTALL_DOCKER.md?at=master
+
+this cgm viewer works, but is very slow.
+The only cgm viewer that actualy works is ABViewer
+https://cadsofttools.com/products/abviewer/buy/
+
+
+
+https://en.wikipedia.org/wiki/Classical_electromagnetism
+https://fusefactory.github.io/openfuse/strange%20attractors/particle%20system/Strange-Attractors-GPU/
 
 https://gpfault.net/posts/webgl2-particles.txt.html
 
