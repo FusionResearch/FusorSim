@@ -36,7 +36,7 @@
 		const isEdge = /Edge/i.test(navigator.userAgent);
 
 		// Texture width for simulation (each texel is a debris particle)
-		const WIDTH = (isIE || isEdge) ? 4 : 128;
+		const WIDTH = (isIE || isEdge) ? 4 : 64;
 
 		let container, stats;
 		let camera, scene, renderer, geometry;
@@ -103,7 +103,14 @@
 
 			scene = new THREE.Scene();
 
-			renderer = new THREE.WebGLRenderer();
+			renderer = new THREE.WebGLRenderer()
+
+			if(! renderer.capabilities.isWebGL2)
+			{
+				alert("This browser does not support WebGl2 and will not work for this sim.");
+				return;
+			}
+			
 			renderer.setPixelRatio(window.devicePixelRatio);
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			container.appendChild(renderer.domElement);
@@ -114,7 +121,7 @@
 
 			effectController = {
 				// Can be changed dynamically
-				gravityConstant: 100.0,
+				gravityConstant: 40.0,
 				density: 0.45,
 
 				// Must restart simulation
