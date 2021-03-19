@@ -32,7 +32,13 @@ npx browser-sync start -s -f . --no-notify --host 127.0.0.1 --port 5000
 
 You should now be able to test the sim at  http://localhost:5000
 
+### VsCode extentions
 
+For shader code formating and syntax highlighting:
+1. npm install -g clang-format
+2. install Clang-Format extention
+3. install Shader languages support for VS Code extension
+ 
 
 
 ## Modeling constraints
@@ -40,8 +46,7 @@ for a 1 cubic meter chamber,  with D pressure of y 1.2E-5 Torr that is 1.8E20 pa
 
 1.2E-5 * 1/760 * 1000*22.4 = 0.0003 mol Detrium = 1.8E20 particles/cubic meter
 
-At 1E-3 torr 2.7 x 10E19 / 760 x 1E3 = 3.6 x E13 molecules/cm3 
+1E−7 Torr, corresponds to a neutral particle density ≈ 3.2 × 10^15 m−3  
 
-1 × 10−7 Torr, corresponds to a neutral particle density of ≈ 3.2 × 10^15 m−3  
-
+Check your browser's webgl texture size limits: https://webglreport.com/?v=2
 

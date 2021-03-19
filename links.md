@@ -35,10 +35,6 @@ The only cgm viewer that actualy works is ABViewer
 https://cadsofttools.com/products/abviewer/buy/
 
 
-## Comsol has various particle modules
-https://www.comsol.com/particle-tracing-module
-
-
 ## OPAL (Object Oriented Parallel Accelerator Library) is a parallel open source tool for charged-particle optics in linear accelerators and rings, including 3D space charge.
 https://gitlab.psi.ch/OPAL/src/-/wikis/home
 
@@ -51,10 +47,10 @@ costs $1200 https://simion.com/
 http://physics.bu.edu/~duffy/HTML5/cyclotron.html
 
 
-## custom agent based particle shader
+## Custom agent based particle shader language
 http://tinlizzie.org/~ohshima/shadama2/live2017/
 
-## misc links
+## Misc links
 https://en.wikipedia.org/wiki/Classical_electromagnetism
 https://fusefactory.github.io/openfuse/strange%20attractors/particle%20system/Strange-Attractors-GPU/
 https://gpfault.net/posts/webgl2-particles.txt.html
