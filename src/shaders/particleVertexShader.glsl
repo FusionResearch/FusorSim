@@ -1,4 +1,3 @@
-
 // For PI declaration:
 #include <common>
 
@@ -12,7 +11,7 @@ varying vec4 vColor;
 
 float radiusFromMass( float mass ) {
     // Calculate radius of a sphere from mass and density
-    return pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
+    return pow( ( 3.0 / ( 4.0 * PI ) ) * mass * 4.0 / density, 1.0 / 3.0 );
 }
 
 
@@ -45,4 +44,3 @@ void main() {
     gl_Position = projectionMatrix * mvPosition;
 
 }
-

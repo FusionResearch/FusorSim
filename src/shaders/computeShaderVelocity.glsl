@@ -1,3 +1,4 @@
+// generate the forces on each particle due to the device and other particles
 // For PI declaration:
 #include <common>
 
@@ -5,33 +6,38 @@
 
 uniform float gravityConstant;
 uniform float density;
+uniform float b_field;
+uniform float e_field_per_cm;
 
 const float width = resolution.x;
 const float height = resolution.y;
 
-float radiusFromMass( float mass ) {
-    // Calculate radius of a sphere from mass and density
-    return pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
-}
-
 void main()	{
-
+    // get our particle information
     vec2 uv = gl_FragCoord.xy / resolution.xy;
+    // generate unique particle id from position in the texture
     float idParticle = uv.y * resolution.x + uv.x;
-
+    
+    //get the particle position from texture color data
     vec4 tmpPos = texture2D( texturePosition, uv );
     vec3 pos = tmpPos.xyz;
 
+    //get particle velocity data from texture color data
     vec4 tmpVel = texture2D( textureVelocity, uv );
     vec3 vel = tmpVel.xyz;
     float mass = tmpVel.w;
-
     if ( mass > 0.0 ) {
 
-        float radius = radiusFromMass( mass );
-
+        // placeholder for all forces acting on particle
         vec3 acceleration = vec3( 0.0 );
-
+        // Device interaction
+        
+        // electrode interaction
+        acceleration -= vec3(0.0,pos.y * e_field_per_cm * 0.05,0.0);
+        
+        // magnet interaction
+        acceleration += vec3(vel.z*b_field*-1.0,0.0,vel.x*b_field);
+        //acceleration += vec3(-vel.x*b_field* 0.05,0.0,-vel.z*b_field* 0.05);
         // Gravity interaction
         for ( float y = 0.0; y < height; y++ ) {
 
@@ -55,7 +61,6 @@ void main()	{
 
                 vec3 dPos = pos2 - pos;
                 float distance = length( dPos );
-                float radius2 = radiusFromMass( mass2 );
 
                 if ( distance == 0.0 ) {
                     continue;
@@ -63,22 +68,22 @@ void main()	{
 
                 // Checks collision
 
-                if ( distance < radius + radius2 ) {
+                if ( distance < 0.0 ) {
 
                     if ( idParticle < idParticle2 ) {
 
                         // This particle is aggregated by the other
-                        vel = ( vel * mass + vel2 * mass2 ) / ( mass + mass2 );
-                        mass += mass2;
-                        radius = radiusFromMass( mass );
+                        //vel = ( vel * mass + vel2 * mass2 ) / ( mass + mass2 );
+                        //mass += mass2;
+                        //radius = radiusFromMass( mass );
 
                     }
                     else {
 
                         // This particle dies
-                        mass = 0.0;
-                        radius = 0.0;
-                        vel = vec3( 0.0 );
+                        //mass = 0.0;
+                        //radius = 0.0;
+                        //vel = vec3( 0.0 );
                         break;
 
                     }
@@ -91,7 +96,7 @@ void main()	{
 
                 gravityField = min( gravityField, 1000.0 );
 
-                acceleration += gravityField * normalize( dPos );
+                acceleration -= gravityField * normalize( dPos );
 
             }
 

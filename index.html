@@ -105,12 +105,11 @@
 
 			renderer = new THREE.WebGLRenderer()
 
-			if(! renderer.capabilities.isWebGL2)
-			{
+			if (!renderer.capabilities.isWebGL2) {
 				alert("This browser does not support WebGl2 and will not work for this sim.");
 				return;
 			}
-			
+
 			renderer.setPixelRatio(window.devicePixelRatio);
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			container.appendChild(renderer.domElement);
@@ -121,8 +120,10 @@
 
 			effectController = {
 				// Can be changed dynamically
-				gravityConstant: 40.0,
+				gravityConstant: 12.45,
 				density: 0.45,
+				b_field: 0.747,
+				e_field_per_cm: 2.779,
 
 				// Must restart simulation
 				radius: 300,
@@ -177,6 +178,8 @@
 
 			velocityUniforms["gravityConstant"] = { value: 0.0 };
 			velocityUniforms["density"] = { value: 0.0 };
+			velocityUniforms["b_field"] = { value: 0.0 };
+			velocityUniforms["e_field_per_cm"] = { value: 0.0 };
 
 			const error = gpuCompute.init();
 
@@ -301,7 +304,7 @@
 		}
 
 		function fillTextures(texturePosition, textureVelocity) {
-
+			//set initial values for simulation
 			const posArray = texturePosition.image.data;
 			const velArray = textureVelocity.image.data;
 
@@ -331,17 +334,20 @@
 				const rExp = radius * Math.pow(rr, exponent);
 
 				// Velocity
+				// should create Maxwell-Boltzman distribution based on temperature
 				const vel = maxVel * Math.pow(rr, velExponent);
 
 				const vx = vel * z + (Math.random() * 2 - 1) * randVel;
 				const vy = (Math.random() * 2 - 1) * randVel * 0.05;
 				const vz = - vel * x + (Math.random() * 2 - 1) * randVel;
 
-				x *= rExp;
-				z *= rExp;
+				//const vx = ( Math.random() * 2 - 1 ) * randVel * 0.005;
+				//const vy = ( Math.random() * 2 - 1 ) * randVel * 0.005;
+				//const vz = ( Math.random() * 2 - 1 ) * randVel * 0.005;
+
 				const y = (Math.random() * 2 - 1) * height;
 
-				const mass = Math.random() * maxMass + 1;
+				const mass = 1;
 
 				// Fill in texture values
 				posArray[k + 0] = x;
@@ -355,6 +361,7 @@
 				velArray[k + 3] = mass;
 
 			}
+
 
 		}
 
@@ -373,6 +380,8 @@
 
 			velocityUniforms["gravityConstant"].value = effectController.gravityConstant;
 			velocityUniforms["density"].value = effectController.density;
+			velocityUniforms["e_field_per_cm"].value = effectController.e_field_per_cm;
+			velocityUniforms["b_field"].value = effectController.b_field;
 			particleUniforms["density"].value = effectController.density;
 
 		}
@@ -386,6 +395,8 @@
 			folder1.add(effectController, "gravityConstant", 0.0, 1000.0, 0.05).onChange(dynamicValuesChanger);
 			folder1.add(effectController, "density", 0.0, 10.0, 0.001).onChange(dynamicValuesChanger);
 
+			folder1.add(effectController, "b_field", 0.0, 10.0, 0.001).onChange(dynamicValuesChanger);
+			folder1.add(effectController, "e_field_per_cm", 0.0, 10.0, 0.001).onChange(dynamicValuesChanger);
 			const folder2 = gui.addFolder('Static parameters');
 
 			folder2.add(effectController, "radius", 10.0, 1000.0, 1.0);
