@@ -4,7 +4,7 @@
 
 #define delta (1.0 / 60.0)
 
-uniform float gravityConstant;
+uniform float ion_repulsion;
 uniform float density;
 uniform float b_field;
 uniform float e_field_per_cm;
@@ -90,7 +90,7 @@ void main() {
 
         float distanceSq = distance * distance;
 
-        float gravityField = gravityConstant * mass2 / distanceSq;
+        float gravityField = ion_repulsion * mass2 / distanceSq;
 
         gravityField = min(gravityField, 1000.0);
 
