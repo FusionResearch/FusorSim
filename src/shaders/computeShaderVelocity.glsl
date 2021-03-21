@@ -30,14 +30,7 @@ void main() {
 
     // placeholder for all forces acting on particle
     vec3 acceleration = vec3(0.0);
-    // Device interaction
 
-    // electrode interaction
-    acceleration -= vec3(0.0, pos.y * e_field_per_cm * 0.05, 0.0);
-
-    // magnet interaction
-    acceleration += vec3(vel.z * b_field * -1.0, 0.0, vel.x * b_field);
-    // acceleration += vec3(-vel.x*b_field* 0.05,0.0,-vel.z*b_field* 0.05);
     // Gravity interaction
     for (float y = 0.0; y < height; y++) {
 
@@ -103,7 +96,11 @@ void main() {
     }
 
     // Dynamics
+    //electric field
+    acceleration -= vec3(0.0, pos.y * e_field_per_cm * delta, 0.0);
     vel += delta * acceleration;
+    //magnetic field rotates velocity vector
+    vel = vec3(cos(b_field*delta)*vel.x - sin(b_field*delta)*vel.z , vel.y, sin(b_field*delta)*vel.x + cos(b_field*delta)*vel.z);
   }
 
   gl_FragColor = vec4(vel, mass);
