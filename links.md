@@ -21,6 +21,10 @@ https://github.com/RobinKa/maxwell-simulation
 Open-source, user-friendly and designed for high performances on super-computers, it is applied to a wide range of physics studies: from relativistic laser-plasma interaction to astrophysics
 https://smileipic.github.io/Smilei/highlights.html
 
+
+skeleton cuda codes with good math pdfs
+https://github.com/UCLA-Plasma-Simulation-Group/PIC-skeleton-codes/blob/master/gpu/gpubpic2/EMModels.pdf
+
 ## BLAST/WARP State-of-the-art simulation for better particle accelerators
 https://bitbucket.org/berkeleylab/warp/
 http://warp.lbl.gov/home/how-to-s/installation

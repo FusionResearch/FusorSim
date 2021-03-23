@@ -19,8 +19,12 @@
 		<!-- <a href="http://www.ddprofusion.com/" target="_blank" rel="noopener">DD Pro Fusion</a> - -->
 		<a href="https://github.com/FusionResearch/FusorSim" target="_blank" rel="noopener">FusorSim</a> -
 		<span id="protoplanets"></span> webgl gpgpu
+
+		
 	</div>
 
+	<div id="mainContainer"></div>
+	<!-- <div class="Panel" id="viewHelper" style="position: absolute; right: 0px; bottom: 0px; height: 128px; width: 128px;"></div> -->
 
 	<script type="module">
 
@@ -32,6 +36,8 @@
 		import { OrbitControls } from './vendor/three/jsm/controls/OrbitControls.js';
 		import { GPUComputationRenderer } from './vendor/three/jsm/misc/GPUComputationRenderer.js';
 
+		import { ViewHelper } from './vendor/three/editor/js/Viewport.ViewHelper.js';
+
 		const isIE = /Trident/i.test(navigator.userAgent);
 		const isEdge = /Edge/i.test(navigator.userAgent);
 
@@ -40,6 +46,7 @@
 
 		let container, stats;
 		let camera, scene, renderer, geometry;
+		let viewHelper;
 
 		const PARTICLES = WIDTH * WIDTH;
 
@@ -103,7 +110,9 @@
 
 
 			container = document.createElement('div');
+			container.setAttribute('id','mainSimViewport')
 			document.body.appendChild(container);
+			//container = document.getElementById('mainContainer');
 
 			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 5, 15000);
 			camera.position.y = 120;
@@ -221,8 +230,11 @@
 
 		function initHelpers() {
 			//The X axis is red. The Y axis is green. The Z axis is blue.
-			const axesHelper = new THREE.AxesHelper(200);
-			scene.add(axesHelper);
+			viewHelper = new ViewHelper( camera, container );
+
+
+			// const axesHelper = new THREE.AxesHelper(200);
+			// scene.add(axesHelper);
 		}
 
 		function initFusorModel() {
@@ -433,6 +445,11 @@
 
 		function animate() {
 			requestAnimationFrame(animate);
+			
+			// if ( viewHelper.animating === true ) {
+			// 	viewHelper.update( delta );
+			// }
+
 			render();
 			stats.update();
 		}
@@ -444,7 +461,12 @@
 			particleUniforms["texturePosition"].value = gpuCompute.getCurrentRenderTarget(positionVariable).texture;
 			particleUniforms["textureVelocity"].value = gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
 
+			renderer.setViewport( 0, 0, container.offsetWidth, container.offsetHeight );
+			
 			renderer.render(scene, camera);
+			renderer.autoClear = false;
+			viewHelper.render(renderer);
+			renderer.autoClear = true;
 
 		}
 
