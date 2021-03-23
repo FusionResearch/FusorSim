@@ -20,19 +20,19 @@ function ViewHelper( editorCamera, container ) {
 
 	var scope = this;
 
-	// panel.dom.addEventListener( 'mouseup', function ( event ) {
+	panel.dom.addEventListener( 'mouseup', function ( event ) {
 
-	// 	event.stopPropagation();
+		event.stopPropagation();
 
-	// 	scope.handleClick( event );
+		scope.handleClick( event );
 
-	// } );
+	} );
 
-	// panel.dom.addEventListener( 'mousedown', function ( event ) {
+	panel.dom.addEventListener( 'mousedown', function ( event ) {
 
-	// 	event.stopPropagation();
+		event.stopPropagation();
 
-	// } );
+	} );
 
 	container.appendChild( panel.dom );
 	
@@ -159,7 +159,95 @@ function ViewHelper( editorCamera, container ) {
 
 
 
+	var targetPosition = new THREE.Vector3();
+	var targetQuaternion = new THREE.Quaternion();
+
+	var q1 = new THREE.Quaternion();
+	var q2 = new THREE.Quaternion();
+	var radius = 0;
+
+	this.handleClick = function ( event ) {
+
+		// if ( this.animating === true ) return false;
+
+		var rect = container.getBoundingClientRect();
+		var offsetX = rect.left + ( container.offsetWidth - dim );
+		var offsetY = rect.top + ( container.offsetHeight - dim );
+		mouse.x = ( ( event.clientX - offsetX ) / ( rect.width - offsetX ) ) * 2 - 1;
+		mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
+
+		raycaster.setFromCamera( mouse, camera );
+
+		var intersects = raycaster.intersectObjects( interactiveObjects );
+
+		if ( intersects.length > 0 ) {
+
+			var intersection = intersects[ 0 ];
+			var object = intersection.object;
+			var focusPoint =  new THREE.Vector3(0,0,0);
+
+			switch ( object.userData.type ) {
+
+				case 'posX':
+					targetPosition.set( 1, 0, 0 );
+					targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI * 0.5, 0 ) );
+					break;
 	
+				case 'posY':
+					targetPosition.set( 0, 1, 0 );
+					targetQuaternion.setFromEuler( new THREE.Euler( - Math.PI * 0.5, 0, 0 ) );
+					break;
+	
+				case 'posZ':
+					targetPosition.set( 0, 0, 1 );
+					targetQuaternion.setFromEuler( new THREE.Euler() );
+					break;
+	
+				case 'negX':
+					targetPosition.set( - 1, 0, 0 );
+					targetQuaternion.setFromEuler( new THREE.Euler( 0, - Math.PI * 0.5, 0 ) );
+					break;
+	
+				case 'negY':
+					targetPosition.set( 0, - 1, 0 );
+					targetQuaternion.setFromEuler( new THREE.Euler( Math.PI * 0.5, 0, 0 ) );
+					break;
+	
+				case 'negZ':
+					targetPosition.set( 0, 0, - 1 );
+					targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI, 0 ) );
+					break;
+	
+				default:
+					console.error( 'ViewHelper: Invalid axis.' );
+	
+			}
+	
+			radius = editorCamera.position.distanceTo( focusPoint );
+			targetPosition.multiplyScalar(radius).add( focusPoint );
+		
+			dummy.position.copy( focusPoint );
+	
+			dummy.lookAt( editorCamera.position );
+			q1.copy( dummy.quaternion );
+	
+			dummy.lookAt( targetPosition );
+			q2.copy( dummy.quaternion );
+
+			editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q2 ).multiplyScalar( radius ).add( focusPoint );
+			editorCamera.lookAt(focusPoint);
+			editorCamera.updateProjectionMatrix();
+
+			return true;
+
+		} else {
+
+			return false;
+
+		}
+
+	};
+
 
 
 	function getAxisMaterial( color ) {
