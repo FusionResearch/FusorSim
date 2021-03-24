@@ -6,6 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="./src/css/main.css">
+	<link rel="icon" type="image/gif" href="./favicon.gif">
 	<style>
 		#warning {
 			color: #ff0000;
@@ -22,8 +23,7 @@
 	</div>
 
 	<div id="mainSimViewport">
-		<div class="Panel" id="gaugeContainer"
-			style="position: absolute; left: 0px; bottom: 0px;  width: 100px;">
+		<div class="Panel" id="gaugeContainer" style="position: absolute; left: 0px; bottom: 0px;  width: 100px;">
 		</div>
 
 	</div>
@@ -58,7 +58,7 @@
 		const PARTICLES = WIDTH * WIDTH;
 
 		let gpuCompute;
-		let diagGauges =  new Map();
+		let diagGauges = new Map();
 		let frameNumber = 0;
 		let velocityVariable;
 		let positionVariable;
@@ -236,10 +236,8 @@
 		function initHelpers() {
 			//The X axis is red. The Y axis is green. The Z axis is blue.
 			viewHelper = new ViewHelper(camera, container);
-
-
-			// const axesHelper = new THREE.AxesHelper(200);
-			// scene.add(axesHelper);
+			//const axesHelper = new THREE.AxesHelper(200);
+			//scene.add(axesHelper);
 		}
 
 		function initFusorModel() {
@@ -461,7 +459,7 @@
 				// set guage to random value for testing
 				// diagGauges['density'].value = getRandomInt(200);
 				diagGauges.forEach(g => {
-				 	g.value= getRandomInt(200);
+					g.value = getRandomInt(200);
 				});
 			}
 			frameNumber += 1;
@@ -543,8 +541,8 @@
 
 
 		function initGauges() {
-			initgauge('fusions', 'Fusions', {minValue: 0, maxValue: 240});
-			initgauge('density', 'Density', {minValue: 0, maxValue: 100});
+			initgauge('fusions', 'Fusions', { minValue: 0, maxValue: 240 });
+			initgauge('density', 'Density', { minValue: 0, maxValue: 100 });
 			diagGauges.forEach(g => {
 				g.draw();
 			});
