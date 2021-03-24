@@ -243,7 +243,7 @@
 		}
 
 		function initFusorModel() {
-
+			// draw the magnets and vac chamber
 			const fusorScale = 1;
 			const mag_distance = 250 * fusorScale; // distance between magnet rings
 			const mag_R = 200 * fusorScale; // major radius of magnet
@@ -539,7 +539,7 @@
 
 
 		function initGauges() {
-			diagGauges['test-gauge'] = initgauge('test-gauge', 'neutrons', {minValue: 0, maxValue: 240});
+			diagGauges['test-gauge'] = initgauge('test-gauge', 'Fusions', {minValue: 0, maxValue: 240});
 			diagGauges.forEach(g => {
 				g.draw();
 			});
