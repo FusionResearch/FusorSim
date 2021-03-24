@@ -19,12 +19,98 @@
 		<!-- <a href="http://www.ddprofusion.com/" target="_blank" rel="noopener">DD Pro Fusion</a> - -->
 		<a href="https://github.com/FusionResearch/FusorSim" target="_blank" rel="noopener">FusorSim</a> -
 		<span id="protoplanets"></span> webgl gpgpu
-
-		
 	</div>
 
-	<div id="mainContainer"></div>
-	<!-- <div class="Panel" id="viewHelper" style="position: absolute; right: 0px; bottom: 0px; height: 128px; width: 128px;"></div> -->
+	<div id="mainSimViewport">
+		<div class="Panel" id="guageContainer"
+			style="position: absolute; left: 0px; bottom: 0px; height: 140px; width: 128px;">
+			<canvas id="test-guage"></canvas>
+		</div>
+
+	</div>
+
+	<script async src="./vendor/guages.min.js" onload="initScriptedGauges()"></script>
+
+	<script>
+		function initScriptedGauges() {
+			new RadialGauge({
+				renderTo: 'test-guage',
+				width: 100,
+				height: 100,
+				// units: 'N/s',
+				fontUnitsSize: 10,
+				fontTitleSize: 70,
+				title: 'Density',
+				value: 20,
+				minValue: 0,
+				maxValue: 240,
+				highlights: [
+					{
+						"from": 160,
+						"to": 240,
+						"color": "rgba(200, 50, 50, .75)"
+					}
+				],
+				exactTicks:true,
+				strokeTicks:false,
+				majorTicks:[ 10, 120, 230],
+				numbersMargin:-15,
+				minorTicks: 30,
+				strokeTicks: true,
+				needleType: "arrow",
+				needleShadow:false,
+				needleWidth: 7,
+				needleCircleSize: 1,
+				needleCircleOuter: true,
+				needleCircleInner: false,
+				fontNumbersSize: 30,
+				borders: false,
+				colorPlate: "#fff",
+				valueBox: true,
+				colorValueBoxBackground:'#eee',
+				valueBoxStroke:0, 
+				fontValueSize:60,
+				valueTextShadow:true,
+			}).draw();
+		}
+
+		if (!Array.prototype.forEach) {
+			Array.prototype.forEach = function (cb) {
+				var i = 0, s = this.length;
+				for (; i < s; i++) {
+					cb && cb(this[i], i, this);
+				}
+			}
+		}
+
+		document.fonts && document.fonts.forEach(function (font) {
+			font.loaded.then(function () {
+				if (font.family.match(/Led/)) {
+					document.gauges.forEach(function (gauge) {
+						gauge.update();
+					});
+				}
+			});
+		});
+
+		var timers = [];
+
+		function animateGauges() {
+			document.gauges.forEach(function (gauge) {
+				timers.push(setInterval(function () {
+					gauge.value = Math.random() *
+						(gauge.options.maxValue - gauge.options.minValue) / 4 +
+						gauge.options.minValue / 4;
+				}, gauge.animation.duration + 50));
+			});
+		}
+
+		function stopGaugesAnimation() {
+			timers.forEach(function (timer) {
+				clearInterval(timer);
+			});
+		}
+	</script>
 
 	<script type="module">
 
@@ -70,14 +156,14 @@
 			animate();
 		});
 
-        // Standard Normal variate using Box-Muller transform.
-        //from https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
-        function randn_bm() {
-            var u = 0, v = 0;
-            while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-            while(v === 0) v = Math.random();
-            return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
-        }
+		// Standard Normal variate using Box-Muller transform.
+		//from https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
+		function randn_bm() {
+			var u = 0, v = 0;
+			while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+			while (v === 0) v = Math.random();
+			return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+		}
 
 		function loadShaders(callback) {
 			THREE.Cache.enabled = true;
@@ -109,10 +195,10 @@
 		function init() {
 
 
-			container = document.createElement('div');
-			container.setAttribute('id','mainSimViewport')
-			document.body.appendChild(container);
-			//container = document.getElementById('mainContainer');
+			//container = document.createElement('div');
+			//container.setAttribute('id','mainSimViewport')
+			//document.body.appendChild(container);
+			container = document.getElementById('mainSimViewport');
 
 			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 5, 15000);
 			camera.position.y = 120;
@@ -230,7 +316,7 @@
 
 		function initHelpers() {
 			//The X axis is red. The Y axis is green. The Z axis is blue.
-			viewHelper = new ViewHelper( camera, container );
+			viewHelper = new ViewHelper(camera, container);
 
 
 			// const axesHelper = new THREE.AxesHelper(200);
@@ -350,10 +436,10 @@
 				} while (rr > 1);
 
 				x = x * radius;
-                z = z * radius;
+				z = z * radius;
 				const y = (Math.random() * 2 - 1) * height;
 
-                // Velocity
+				// Velocity
 				// create Maxwell-Boltzman distribution based on temperature
 				// technique from https://scicomp.stackexchange.com/questions/19969/how-do-i-generate-maxwell-boltzmann-variates-using-a-uniform-distribution-random
 				const vx = randn_bm() * temperature;
@@ -445,7 +531,7 @@
 
 		function animate() {
 			requestAnimationFrame(animate);
-			
+
 			// if ( viewHelper.animating === true ) {
 			// 	viewHelper.update( delta );
 			// }
@@ -461,8 +547,8 @@
 			particleUniforms["texturePosition"].value = gpuCompute.getCurrentRenderTarget(positionVariable).texture;
 			particleUniforms["textureVelocity"].value = gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
 
-			renderer.setViewport( 0, 0, container.offsetWidth, container.offsetHeight );
-			
+			renderer.setViewport(0, 0, container.offsetWidth, container.offsetHeight);
+
 			renderer.render(scene, camera);
 			renderer.autoClear = false;
 			viewHelper.render(renderer);
@@ -474,4 +560,3 @@
 </body>
 
 </html>
-
