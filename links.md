@@ -11,12 +11,25 @@ https://graphtoy.com/index.html
 
 check your browser's webgl support
 https://webglreport.com/?v=2
+chrome://gpu/
+chrome://flags/
+
+# opengl tools
+https://github.com/g-truc/glm
+
+https://github.com/gpujs/gpu.js
+
+https://github.com/BabylonJS/Spector.js/blob/master/documentation/extension.md
+
 
 # Other Sims
 
 really good webgl simuation
 https://github.com/RobinKa/maxwell-simulation
 
+
+Helmholtz Coil Simulator, simulate ion path in field of two coils
+https://iwant2study.org/ospsg/index.php/interactive-resources/physics/05-electricity-and-magnetism/08-electromagnetism/701-mirrorfieldwee#faqnoanchor
 
 Open-source, user-friendly and designed for high performances on super-computers, it is applied to a wide range of physics studies: from relativistic laser-plasma interaction to astrophysics
 https://smileipic.github.io/Smilei/highlights.html

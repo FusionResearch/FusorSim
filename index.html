@@ -289,7 +289,7 @@
 			for (let i = 0; i < PARTICLES; i++) {
 
 				positions[p++] = (Math.random() * 2 - 1) * effectController.radius;
-				positions[p++] = 0; //( Math.random() * 2 - 1 ) * effectController.radius;
+				positions[p++] = ( Math.random() * 2 - 1 ) * effectController.radius;
 				positions[p++] = (Math.random() * 2 - 1) * effectController.radius;
 
 			}
@@ -373,18 +373,34 @@
 				const vz = randn_bm() * temperature;
 
 
-				const mass = 1;
+				// charge is held before decimal point,  mass is held after 
+				// so mass of D = 0.2 in our units
+				const DEUTERIUM_MASS = 	2.014101;
+				const ELECTRON_MASS = 5.485799e-4;
+
+				// we store mass in the fractional part of the float
+				// so mass of 0.1 = 1 daltons
+				let mass = DEUTERIUM_MASS /10;
+				let charge = 1;
+
+				if(k%16 == 0) {// make 1 out of 16 ions be electrons
+					charge = -1;
+					mass = ELECTRON_MASS /10;
+				}
+
+				// pack charge and mass into one float
+				let chargeMass = charge+(Math.sign(charge)*mass);
 
 				// Fill in texture values
 				posArray[k + 0] = x;
 				posArray[k + 1] = y;
 				posArray[k + 2] = z;
-				posArray[k + 3] = 1;
+				posArray[k + 3] = 1; // this is a uniform cordinate, must be 1
 
 				velArray[k + 0] = vx;
 				velArray[k + 1] = vy;
 				velArray[k + 2] = vz;
-				velArray[k + 3] = mass;
+				velArray[k + 3] = chargeMass; 
 
 			}
 

@@ -12,6 +12,15 @@ uniform float e_field_per_cm;
 const float width = resolution.x;
 const float height = resolution.y;
 
+
+float trunc(float x) {
+  if (x >= 0.0) {
+    return floor(x); 
+  } else {
+    return ceil(x);
+  }
+}
+
 void main() {
   // get our particle information
   vec2 uv = gl_FragCoord.xy / resolution.xy;
@@ -25,7 +34,8 @@ void main() {
   // get particle velocity data from texture color data
   vec4 tmpVel = texture2D(textureVelocity, uv);
   vec3 vel = tmpVel.xyz;
-  float mass = tmpVel.w;
+  float mass = fract(tmpVel.w);
+  float charge = trunc(tmpVel.w);
   if (mass > 0.0) {
 
     // placeholder for all forces acting on particle
@@ -40,7 +50,8 @@ void main() {
         vec3 pos2 = texture2D(texturePosition, secondParticleCoords).xyz;
         vec4 velTemp2 = texture2D(textureVelocity, secondParticleCoords);
         vec3 vel2 = velTemp2.xyz;
-        float mass2 = velTemp2.w;
+        float mass2 = fract(velTemp2.w);
+        float charge2 = trunc(tmpVel.w);
 
         float idParticle2 =
             secondParticleCoords.y * resolution.x + secondParticleCoords.x;
@@ -103,5 +114,5 @@ void main() {
     vel = vec3(cos(b_field*delta)*vel.x - sin(b_field*delta)*vel.z , vel.y, sin(b_field*delta)*vel.x + cos(b_field*delta)*vel.z);
   }
 
-  gl_FragColor = vec4(vel, mass);
+  gl_FragColor = vec4(vel, tmpVel.w);
 }

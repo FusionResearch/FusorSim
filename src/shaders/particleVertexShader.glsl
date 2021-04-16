@@ -21,15 +21,24 @@ void main() {
 
   vec4 velTemp = texture2D(textureVelocity, uv);
   vec3 vel = velTemp.xyz;
-  float mass = velTemp.w;
+   //  charge is held before decimal point,  mass is held after 
+  float mass = fract(velTemp.w); 
+  float charge = floor(velTemp.w)+1.0;
 
-  vColor = vec4(1.0, mass / 250.0, 0.0, 1.0);
+
+  vColor = vec4(1.0, 0.0, 0.0, 1.0);
+
+  if(charge < 0.0)
+  {
+    //electrons are blue
+    vColor = vec4(0.0, 0.0, 1.0, 1.0);
+  }
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
 
   // Calculate radius of a sphere from mass and density
   // float radius = pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
-  float radius = radiusFromMass(mass);
+  float radius = 1.0;
 
   // Apparent size in pixels
   if (mass == 0.0) {
