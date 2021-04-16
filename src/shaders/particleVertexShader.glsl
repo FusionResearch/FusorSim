@@ -9,10 +9,18 @@ uniform float density;
 
 varying vec4 vColor;
 
-float radiusFromMass(float mass) {
-  // Calculate radius of a sphere from mass and density
-  return pow((3.0 / (4.0 * PI)) * mass * 4.0 / density, 1.0 / 3.0);
+
+// extract mass from fractional part of float
+float getMass(vec4 tmpVel) {
+  return fract(abs(tmpVel.w))*10.0;
 }
+
+// extract charge from whole part of float
+float getCharge(vec4 tmpVel) {
+  return trunc(tmpVel.w);
+}
+
+
 
 void main() {
 
@@ -22,23 +30,28 @@ void main() {
   vec4 velTemp = texture2D(textureVelocity, uv);
   vec3 vel = velTemp.xyz;
    //  charge is held before decimal point,  mass is held after 
-  float mass = fract(velTemp.w); 
-  float charge = floor(velTemp.w)+1.0;
+  float mass = getMass(velTemp); 
+  float charge = getCharge(velTemp);
 
 
-  vColor = vec4(1.0, 0.0, 0.0, 1.0);
+  // neutrons are white
+  vColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-  if(charge < 0.0)
+  if(charge < -0.1)
   {
     //electrons are blue
     vColor = vec4(0.0, 0.0, 1.0, 1.0);
   }
+  if(charge > 0.1)
+  {
+    //positve ions  are red
+    vColor = vec4(1.0, 0.0, 0.0, 1.0);
+  }
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
 
-  // Calculate radius of a sphere from mass and density
-  // float radius = pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
-  float radius = 1.0;
+  // draw more massive particles bigger
+  float radius = clamp(10.0 * mass,0.5,0.99);
 
   // Apparent size in pixels
   if (mass == 0.0) {

@@ -21,6 +21,23 @@ float trunc(float x) {
   }
 }
 
+// extract mass from fractional part of float
+float getMass(vec4 tmpVel) {
+  return fract(abs(tmpVel.w))*10.0;
+}
+
+// extract charge from whole part of float
+float getCharge(vec4 tmpVel) {
+  return trunc(tmpVel.w);
+}
+
+float encodeChargeMass(float charge, float mass)
+{
+   return charge + ((mass/10.0)*sign(charge)); 
+}
+
+
+
 void main() {
   // get our particle information
   vec2 uv = gl_FragCoord.xy / resolution.xy;
@@ -34,14 +51,14 @@ void main() {
   // get particle velocity data from texture color data
   vec4 tmpVel = texture2D(textureVelocity, uv);
   vec3 vel = tmpVel.xyz;
-  float mass = fract(tmpVel.w);
-  float charge = trunc(tmpVel.w);
+  float mass = getMass(tmpVel);
+  float charge = getCharge(tmpVel);
   if (mass > 0.0) {
 
     // placeholder for all forces acting on particle
     vec3 acceleration = vec3(0.0);
 
-    // Gravity interaction
+    // Charge interaction
     for (float y = 0.0; y < height; y++) {
 
       for (float x = 0.0; x < width; x++) {
@@ -50,7 +67,6 @@ void main() {
         vec3 pos2 = texture2D(texturePosition, secondParticleCoords).xyz;
         vec4 velTemp2 = texture2D(textureVelocity, secondParticleCoords);
         vec3 vel2 = velTemp2.xyz;
-        float mass2 = fract(velTemp2.w);
         float charge2 = trunc(tmpVel.w);
 
         float idParticle2 =
@@ -60,7 +76,7 @@ void main() {
           continue;
         }
 
-        if (mass2 == 0.0) {
+        if (charge2 == 0.0) {
           continue;
         }
 
@@ -71,34 +87,31 @@ void main() {
           continue;
         }
 
-        // Checks collision
+        // Checks collision/ fusion
+        if (distance < 0.01) {
 
-        if (distance < 0.0) {
-
-          if (idParticle < idParticle2) {
-
-            // This particle is aggregated by the other
-            // vel = ( vel * mass + vel2 * mass2 ) / ( mass + mass2 );
-            // mass += mass2;
-            // radius = radiusFromMass( mass );
+          if (idParticle > idParticle2) {
+            // This particle fuses with the other
+            //vel = vec3( y,x,y+x );
+            mass = 0.2; 
+            charge = 0.0;
 
           } else {
-
             // This particle dies
-            // mass = 0.0;
-            // radius = 0.0;
-            // vel = vec3( 0.0 );
+            mass = 0.0;
+            charge = 0.0;
+            vel = vec3( 0.0 );
             break;
           }
         }
 
         float distanceSq = distance * distance;
 
-        float gravityField = ion_repulsion * mass2 / distanceSq;
+        float chargeField = ion_repulsion * charge2 / distanceSq;
 
-        gravityField = min(gravityField, 1000.0);
+        chargeField = min(chargeField, 1000.0);
 
-        acceleration -= gravityField * normalize(dPos);
+        acceleration -= chargeField * normalize(dPos);
       }
 
       if (mass == 0.0) {
@@ -107,12 +120,13 @@ void main() {
     }
 
     // Dynamics
-    //electric field
-    acceleration -= vec3(0.0, pos.y * e_field_per_cm * delta, 0.0);
+    // static electric field from end electrodes ?
+    acceleration -= vec3(0.0, pos.y * e_field_per_cm * delta /mass, 0.0);
     vel += delta * acceleration;
+
     //magnetic field rotates velocity vector
     vel = vec3(cos(b_field*delta)*vel.x - sin(b_field*delta)*vel.z , vel.y, sin(b_field*delta)*vel.x + cos(b_field*delta)*vel.z);
   }
 
-  gl_FragColor = vec4(vel, tmpVel.w);
+  gl_FragColor = vec4(vel, encodeChargeMass(charge,mass));
 }
